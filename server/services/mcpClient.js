@@ -12,13 +12,22 @@ export class MCPClient {
     try {
       console.log('🔗 Attempting to connect to Tatum MCP server...')
       
-      // Windows-specific MCP connection
+      // Detect environment for optimal MCP connection
+      const isWSL = process.platform === 'linux' && process.env.WSL_DISTRO_NAME
       const isWindows = process.platform === 'win32'
+      
+      if (isWSL) {
+        console.log('🐧🪟 Using Linux MCP client (WSL detected)')
+      } else if (isWindows) {
+        console.log('🪟 Using Windows MCP client')
+      } else {
+        console.log('🐧 Using Linux MCP client')
+      }
       
       // For Windows, use PowerShell to run npx
       let command, args
       
-      if (isWindows) {
+      if (isWindows && !isWSL) {
         command = 'powershell.exe'
         args = ['-Command', 'npx', '@tatumio/blockchain-mcp']
       } else {
@@ -40,7 +49,7 @@ export class MCPClient {
           PATH: process.env.PATH
         },
         // Windows-specific options
-        ...(isWindows && {
+        ...(isWindows && !isWSL && {
           windowsHide: true
         })
       })

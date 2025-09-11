@@ -1,24 +1,13 @@
 import { MCPClient } from './mcpClient.js'
-import { WorkingWindowsMCP } from './workingWindowsMCP.js'
 
 export class TatumService {
   constructor() {
     this.apiKey = process.env.TATUM_API_KEY
     this.baseURL = 'https://api.tatum.io'
     
-    // Detect environment and use optimal MCP client
-    const isWSL = process.platform === 'linux' && process.env.WSL_DISTRO_NAME
-    
-    if (isWSL) {
-      this.mcpClient = new MCPClient()
-      console.log('🐧🪟 Using Linux MCP client (WSL detected)')
-    } else if (process.platform === 'win32') {
-      this.mcpClient = new WorkingWindowsMCP()
-      console.log('🪟 Using Windows MCP client')
-    } else {
-      this.mcpClient = new MCPClient()
-      console.log('🐧 Using Linux MCP client')
-    }
+    // Use MCPClient for all platforms - it has WSL detection built-in
+    this.mcpClient = new MCPClient()
+    console.log('� Initializing Tatum MCP client...')
     
     this.mcpConnected = false
     
