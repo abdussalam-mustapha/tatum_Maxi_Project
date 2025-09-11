@@ -1,0 +1,25 @@
+{
+  "name": "tatum-maxi",
+  "version": "1.0.0",
+  "description": "Multi-chain crypto portfolio tracker powered by Tatum MCP",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": [
+    "crypto",
+    "blockchain",
+    "portfolio",
+    "tatum",
+    "mcp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "tatum-maxi-server",
+  "version": "1.0.0",
+  "description": "Backend API for Tatum Maxi crypto portfolio tracker",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@tatumio/blockchain-mcp": "^1.0.5",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
