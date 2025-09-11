@@ -126,7 +126,7 @@ app.get('/api/portfolio/:address', async (req, res) => {
     if (!tatumService.isValidAddress(address)) {
       return res.status(400).json({ 
         error: 'Invalid wallet address format',
-        details: 'Please provide a valid Ethereum, Polygon, or Solana address'
+        details: 'Please provide a valid wallet address (Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, or Solana)'
       })
     }
 
@@ -418,12 +418,32 @@ async function analyzePortfolioQuery(portfolioData, query) {
     }
     
     // Chain-specific recommendations
-    const ethValue = allHoldings.filter(h => h.chain === 'ethereum').reduce((sum, h) => sum + h.usdValue, 0)
-    const polyValue = allHoldings.filter(h => h.chain === 'polygon').reduce((sum, h) => sum + h.usdValue, 0)
-    const solValue = allHoldings.filter(h => h.chain === 'solana').reduce((sum, h) => sum + h.usdValue, 0)
+    const chainValues = {}
+    allHoldings.forEach(holding => {
+      if (!chainValues[holding.chain]) {
+        chainValues[holding.chain] = 0
+      }
+      chainValues[holding.chain] += holding.usdValue
+    })
     
-    if (ethValue > polyValue + solValue) {
-      recommendations += `5. 💸 GAS OPTIMIZATION: Heavy Ethereum exposure. Consider moving some assets to Polygon/Solana for lower fees.\n\n`
+    const sortedChains = Object.entries(chainValues)
+      .sort((a, b) => b[1] - a[1])
+      .map(([chain, value]) => ({ chain, value, percentage: (value / totalValue) * 100 }))
+    
+    // Check for high-fee chain dominance
+    const highFeeChains = ['ethereum']
+    const lowFeeChains = ['polygon', 'bsc', 'arbitrum', 'optimism', 'avalanche', 'solana']
+    
+    const highFeeValue = sortedChains
+      .filter(c => highFeeChains.includes(c.chain.toLowerCase()))
+      .reduce((sum, c) => sum + c.value, 0)
+    
+    const lowFeeValue = sortedChains
+      .filter(c => lowFeeChains.includes(c.chain.toLowerCase()))
+      .reduce((sum, c) => sum + c.value, 0)
+    
+    if (highFeeValue > lowFeeValue && highFeeValue > totalValue * 0.6) {
+      recommendations += `5. 💸 GAS OPTIMIZATION: Heavy exposure to high-fee chains (${((highFeeValue/totalValue)*100).toFixed(1)}%). Consider Layer 2 solutions like Arbitrum, Optimism, or Polygon for lower fees.\n\n`
     }
     
     recommendations += `💎 Remember: This analysis is based on current market data. Always DYOR (Do Your Own Research)!`

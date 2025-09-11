@@ -56,32 +56,26 @@ const AIChat = ({ portfolioData, walletAddress }) => {
       return `Your total portfolio is worth $${totalValue.toFixed(2)} across ${chainCount} blockchain${chainCount !== 1 ? 's' : ''}.`
     }
 
-    // Chain-specific questions
-    if (lowerQuery.includes('ethereum') || lowerQuery.includes('eth')) {
-      const ethChain = portfolioData.chains.find(c => c.name === 'ethereum')
-      if (ethChain) {
-        const tokenCount = ethChain.tokens?.length || 0
-        return `On Ethereum: ${parseFloat(ethChain.balance).toFixed(4)} ETH ($${ethChain.usdValue.toFixed(2)}) + ${tokenCount} token${tokenCount !== 1 ? 's' : ''}.`
-      }
-      return "No Ethereum holdings found."
+    // Chain-specific questions - dynamic approach
+    const chainKeywords = {
+      ethereum: ['ethereum', 'eth'],
+      polygon: ['polygon', 'matic'],
+      solana: ['solana', 'sol'],
+      bsc: ['bsc', 'bnb', 'binance'],
+      arbitrum: ['arbitrum', 'arb'],
+      optimism: ['optimism', 'op'],
+      avalanche: ['avalanche', 'avax']
     }
 
-    if (lowerQuery.includes('polygon') || lowerQuery.includes('matic')) {
-      const polyChain = portfolioData.chains.find(c => c.name === 'polygon')
-      if (polyChain) {
-        const tokenCount = polyChain.tokens?.length || 0
-        return `On Polygon: ${parseFloat(polyChain.balance).toFixed(4)} MATIC ($${polyChain.usdValue.toFixed(2)}) + ${tokenCount} token${tokenCount !== 1 ? 's' : ''}.`
+    for (const [chainName, keywords] of Object.entries(chainKeywords)) {
+      if (keywords.some(keyword => lowerQuery.includes(keyword))) {
+        const chain = portfolioData.chains.find(c => c.name === chainName)
+        if (chain) {
+          const tokenCount = chain.tokens?.length || 0
+          return `On ${chainName.charAt(0).toUpperCase() + chainName.slice(1)}: ${parseFloat(chain.balance).toFixed(4)} ${chain.symbol} ($${chain.usdValue.toFixed(2)}) + ${tokenCount} token${tokenCount !== 1 ? 's' : ''}.`
+        }
+        return `No ${chainName.charAt(0).toUpperCase() + chainName.slice(1)} holdings found.`
       }
-      return "No Polygon holdings found."
-    }
-
-    if (lowerQuery.includes('solana') || lowerQuery.includes('sol')) {
-      const solChain = portfolioData.chains.find(c => c.name === 'solana')
-      if (solChain) {
-        const tokenCount = solChain.tokens?.length || 0
-        return `On Solana: ${parseFloat(solChain.balance).toFixed(4)} SOL ($${solChain.usdValue.toFixed(2)}) + ${tokenCount} token${tokenCount !== 1 ? 's' : ''}.`
-      }
-      return "No Solana holdings found."
     }
 
     // Token filtering
@@ -143,6 +137,8 @@ const AIChat = ({ portfolioData, walletAddress }) => {
 • "What's my biggest holding?"
 • "What's my total portfolio worth?"
 • "Show me my Ethereum holdings"
+• "What's on Polygon?"
+• "Show me BSC tokens"
 • "What tokens are worth more than $100?"
 
 🔍 Advanced Analysis (requires wallet data):

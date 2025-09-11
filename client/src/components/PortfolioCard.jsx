@@ -7,7 +7,11 @@ const PortfolioCard = ({ chain, balance, symbol, usdValue, tokens }) => {
       ethereum: '⟠',
       polygon: '⬟', 
       solana: '◎',
-      bitcoin: '₿'
+      bitcoin: '₿',
+      bsc: '●',
+      arbitrum: '🔵',
+      optimism: '🔴',
+      avalanche: '🔺'
     }
     return icons[chainName.toLowerCase()] || '🔗'
   }
@@ -17,7 +21,11 @@ const PortfolioCard = ({ chain, balance, symbol, usdValue, tokens }) => {
       ethereum: 'from-blue-500 to-blue-600',
       polygon: 'from-purple-500 to-purple-600',
       solana: 'from-green-500 to-green-600',
-      bitcoin: 'from-orange-500 to-orange-600'
+      bitcoin: 'from-orange-500 to-orange-600',
+      bsc: 'from-yellow-500 to-yellow-600',
+      arbitrum: 'from-blue-400 to-blue-500',
+      optimism: 'from-red-500 to-red-600',
+      avalanche: 'from-red-400 to-red-500'
     }
     return colors[chainName.toLowerCase()] || 'from-gray-500 to-gray-600'
   }

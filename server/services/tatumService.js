@@ -97,7 +97,11 @@ export class TatumService {
         const chainConfig = {
           ethereum: { symbol: 'ETH', name: 'Ethereum' },
           polygon: { symbol: 'MATIC', name: 'Polygon' },
-          solana: { symbol: 'SOL', name: 'Solana' }
+          solana: { symbol: 'SOL', name: 'Solana' },
+          bsc: { symbol: 'BNB', name: 'BNB Smart Chain' },
+          arbitrum: { symbol: 'ETH', name: 'Arbitrum' },
+          optimism: { symbol: 'ETH', name: 'Optimism' },
+          avalanche: { symbol: 'AVAX', name: 'Avalanche' }
         }
         const config = chainConfig[chain]
         if (config) {
@@ -150,6 +154,10 @@ export class TatumService {
     const chainConfig = {
       ethereum: { symbol: 'ETH', endpoint: 'v3/ethereum/account/balance' },
       polygon: { symbol: 'MATIC', endpoint: 'v3/polygon/account/balance' },
+      bsc: { symbol: 'BNB', endpoint: 'v3/bsc/account/balance' },
+      arbitrum: { symbol: 'ETH', endpoint: 'v3/arbitrum/account/balance' },
+      optimism: { symbol: 'ETH', endpoint: 'v3/optimism/account/balance' },
+      avalanche: { symbol: 'AVAX', endpoint: 'v3/avalanche/account/balance' },
       solana: { symbol: 'SOL', endpoint: 'v3/solana/account/balance' }
     }
 

@@ -55,7 +55,7 @@ const WalletInput = ({ onSubmit, loading }) => {
               type="text"
               value={address}
               onChange={handleInputChange}
-              placeholder="Enter Ethereum, Polygon, or Solana wallet address..."
+              placeholder="Enter wallet address (Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, or Solana)..."
               className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-colors ${
                 !isValid ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
@@ -71,7 +71,7 @@ const WalletInput = ({ onSubmit, loading }) => {
           )}
           
           <p className="mt-2 text-sm text-gray-500">
-            Supports Ethereum (0x...), Solana, and Polygon addresses
+            Supports Ethereum (0x...), BSC, Arbitrum, Optimism, Avalanche, Polygon, and Solana addresses
           </p>
         </div>
 

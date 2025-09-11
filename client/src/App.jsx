@@ -115,7 +115,7 @@ function App() {
               Enter a wallet address to get started
             </h3>
             <p className="text-gray-500">
-              View balances and portfolio details across Ethereum, Polygon, and Solana
+              View balances and portfolio details across multiple blockchains including Ethereum, Polygon, BSC, Arbitrum, Optimism, Avalanche, and Solana
             </p>
           </div>
         )}
