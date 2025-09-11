@@ -147,6 +147,10 @@ const AIChat = ({ portfolioData, walletAddress }) => {
 • "Give me performance insights"
 • "What are your investment recommendations?"
 • "How diverse is my portfolio?"
+• "Is my wallet secure?"
+• "Show me transaction history"
+• "What was my balance last week?"
+• "Do I own any NFTs?"
 
 💡 Just type your question naturally and I'll help you understand your crypto holdings!`
   }

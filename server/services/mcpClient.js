@@ -246,7 +246,32 @@ export class MCPClient {
   }
 
   async checkMaliciousAddress(address) {
-    return await this.callTool('check_malicous_address', { address })
+    return await this.callTool('check_malicious_address', { address })
+  }
+
+  // New MCP tool methods
+  async getSupportedMethods() {
+    return await this.callTool('gateway_get_supported_methods')
+  }
+
+  async executeRPC(method, params, network) {
+    return await this.callTool('gateway_execute_rpc', { method, params, network })
+  }
+
+  async getWalletBalanceByTime(address, timestamp, network) {
+    return await this.callTool('get_wallet_balance_by_time', { address, timestamp, network })
+  }
+
+  async getOwners(contractAddress, tokenId) {
+    return await this.callTool('get_owners', { contractAddress, tokenId })
+  }
+
+  async checkOwner(contractAddress, tokenId, address) {
+    return await this.callTool('check_owner', { contractAddress, tokenId, address })
+  }
+
+  async getBlockByTime(timestamp, network) {
+    return await this.callTool('get_block_by_time', { timestamp, network })
   }
 
   // Get supported chains with static fallback to prevent infinite loading

@@ -71,6 +71,47 @@ export class TatumService {
     }
   }
 
+  // Get comprehensive portfolio data with enhanced MCP features
+  async getComprehensivePortfolio(address) {
+    try {
+      const portfolioData = await this.getPortfolioData(address)
+      
+      // Try to enhance with additional MCP data
+      if (this.mcpConnected) {
+        try {
+          // Add security check
+          const securityCheck = await this.mcpClient.checkMaliciousAddress(address)
+          portfolioData.security = {
+            isMalicious: securityCheck?.isKnownMalicious || false,
+            checked: true
+          }
+          
+          // Add recent transaction count
+          const recentTxs = await this.mcpClient.getTransactionHistory(address, 5)
+          portfolioData.recentActivity = {
+            transactionCount: recentTxs?.length || 0,
+            hasRecentActivity: (recentTxs?.length || 0) > 0
+          }
+          
+          // Add metadata if available
+          const metadata = await this.mcpClient.getMetadata(address)
+          if (metadata) {
+            portfolioData.metadata = metadata
+          }
+          
+        } catch (enhanceError) {
+          console.log('MCP enhancement failed:', enhanceError.message)
+          // Continue with basic portfolio data
+        }
+      }
+      
+      return portfolioData
+    } catch (error) {
+      console.error('Comprehensive portfolio error:', error)
+      throw error
+    }
+  }
+
   // Direct API implementation
   async getPortfolioDataDirect(address) {
     console.log('🔗 Fetching portfolio using direct Tatum API...')
@@ -388,7 +429,46 @@ export class TatumService {
     }
   }
 
-  // Get supported chains from MCP
+  // Get comprehensive portfolio data with enhanced MCP features
+  async getComprehensivePortfolio(address) {
+    try {
+      const portfolioData = await this.getPortfolioData(address)
+      
+      // Try to enhance with additional MCP data
+      if (this.mcpConnected) {
+        try {
+          // Add security check
+          const securityCheck = await this.mcpClient.checkMaliciousAddress(address)
+          portfolioData.security = {
+            isMalicious: securityCheck?.isKnownMalicious || false,
+            checked: true
+          }
+          
+          // Add recent transaction count
+          const recentTxs = await this.mcpClient.getTransactionHistory(address, 5)
+          portfolioData.recentActivity = {
+            transactionCount: recentTxs?.length || 0,
+            hasRecentActivity: (recentTxs?.length || 0) > 0
+          }
+          
+          // Add metadata if available
+          const metadata = await this.mcpClient.getMetadata(address)
+          if (metadata) {
+            portfolioData.metadata = metadata
+          }
+          
+        } catch (enhanceError) {
+          console.log('MCP enhancement failed:', enhanceError.message)
+          // Continue with basic portfolio data
+        }
+      }
+      
+      return portfolioData
+    } catch (error) {
+      console.error('Comprehensive portfolio error:', error)
+      throw error
+    }
+  }
   async getSupportedChains() {
     if (this.mcpConnected) {
       try {
