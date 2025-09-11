@@ -121,7 +121,7 @@ export class TatumService {
     
     // Ethereum-compatible (0x prefix, 42 characters)
     if (address.startsWith('0x') && address.length === 42) {
-      chains.push('ethereum', 'polygon')
+      chains.push('ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'avalanche')
     }
     
     // Solana (base58, typically 32-44 characters, no 0x prefix)
@@ -130,6 +130,12 @@ export class TatumService {
       if (/^[1-9A-HJ-NP-Za-km-z]+$/.test(address)) {
         chains.push('solana')
       }
+    }
+    
+    // Bitcoin (starts with 1, 3, or bc1)
+    if (/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(address) || 
+        /^bc1[a-z0-9]{39,59}$/.test(address)) {
+      chains.push('bitcoin')
     }
     
     // If no specific format detected, default to Ethereum-compatible
@@ -372,5 +378,61 @@ export class TatumService {
     return {
       nfts: []
     }
+  }
+
+  // Get supported chains from MCP
+  async getSupportedChains() {
+    if (this.mcpConnected) {
+      try {
+        console.log('🔗 Getting supported chains from MCP...')
+        return await this.mcpClient.getSupportedChains()
+      } catch (error) {
+        console.log('MCP supported chains failed:', error.message)
+      }
+    }
+    
+    // Fallback list
+    return {
+      chains: ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'avalanche', 'solana']
+    }
+  }
+
+  // Get exchange rates efficiently
+  async getExchangeRates(currencies = ['ETH', 'BTC', 'MATIC']) {
+    const rates = {}
+    
+    if (this.mcpConnected) {
+      console.log('💱 Getting exchange rates from MCP...')
+      // Process currencies in parallel but with timeout
+      const ratePromises = currencies.map(async (currency) => {
+        try {
+          const rate = await this.mcpClient.getExchangeRateWithTimeout(currency, 'USD')
+          return { currency, rate: rate.rate || 0 }
+        } catch (error) {
+          console.log(`Exchange rate for ${currency} failed:`, error.message)
+          return { currency, rate: 0 }
+        }
+      })
+      
+      const results = await Promise.allSettled(ratePromises)
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          rates[result.value.currency] = result.value.rate
+        } else {
+          rates[currencies[index]] = 0
+        }
+      })
+    } else {
+      // Fallback to CoinGecko for basic rates
+      for (const currency of currencies.slice(0, 3)) { // Limit to prevent blocking
+        try {
+          rates[currency] = await this.getCurrentPrice(currency)
+        } catch (error) {
+          rates[currency] = 0
+        }
+      }
+    }
+    
+    return rates
   }
 }

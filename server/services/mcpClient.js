@@ -178,59 +178,51 @@ export class MCPClient {
     try {
       console.log(`🔍 Getting wallet portfolio for address: ${address}`)
       
-      // Based on the error message, we need: chain, addresses, tokenTypes
-      console.log('🔍 Using required parameters: chain, addresses, tokenTypes')
-      const params = {
-        chain: 'ethereum',
-        addresses: [address],
-        tokenTypes: ['native', 'erc20']
-      }
+      // Set a reasonable timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('MCP call timeout after 5 seconds')), 5000)
+      })
       
-      console.log('🔍 Calling get_wallet_portfolio with params:', JSON.stringify(params, null, 2))
-      const result = await this.callTool('get_wallet_portfolio', params)
+      // Use only valid, known chain formats - NO DYNAMIC FETCHING
+      const chainFormats = [
+        'ethereum',
+        'ethereum-mainnet', 
+        'polygon',
+        'polygon-mainnet'
+      ]
       
-      // Check if the result contains an error in the content
-      if (result && result.content && result.content[0] && result.content[0].text) {
+      for (const chain of chainFormats) {
         try {
-          const parsedContent = JSON.parse(result.content[0].text)
-          if (parsedContent.success === false) {
-            console.log('❌ MCP returned error:', parsedContent.error)
-            
-            // If it's still missing parameters, try with more token types
-            if (parsedContent.error.includes('Missing required parameters')) {
-              console.log('🔍 Trying with more comprehensive parameters...')
-              const expandedParams = {
-                chain: 'ethereum',
-                addresses: [address],
-                tokenTypes: ['native', 'erc20', 'erc721', 'erc1155']
-              }
-              
-              console.log('🔍 Expanded params:', JSON.stringify(expandedParams, null, 2))
-              const expandedResult = await this.callTool('get_wallet_portfolio', expandedParams)
-              
-              if (expandedResult && expandedResult.content && expandedResult.content[0] && expandedResult.content[0].text) {
-                const expandedParsed = JSON.parse(expandedResult.content[0].text)
-                if (expandedParsed.success === true) {
-                  console.log('✅ Success with expanded parameters!')
-                  return expandedParsed
-                }
-              }
-            }
-            
-            throw new Error(parsedContent.error)
-          } else {
-            console.log('✅ MCP call successful!')
-            return parsedContent
+          console.log(`🔍 Trying chain format: ${chain}`)
+          const params = {
+            chain: chain,
+            addresses: [address],
+            tokenTypes: ['native', 'erc20']
           }
-        } catch (parseError) {
-          console.log('❌ Failed to parse MCP response:', parseError.message)
-          console.log('Raw response:', result)
-          throw parseError
+          
+          const mcpCall = this.callTool('get_wallet_portfolio', params)
+          const result = await Promise.race([mcpCall, timeoutPromise])
+          
+          // Check if the result contains valid data
+          if (result && result.content && result.content[0] && result.content[0].text) {
+            const parsedContent = JSON.parse(result.content[0].text)
+            if (parsedContent.success !== false && !parsedContent.error?.includes('validation failed')) {
+              console.log(`✅ Success with chain format: ${chain}`)
+              return parsedContent
+            } else {
+              console.log(`❌ Chain ${chain} returned error:`, parsedContent.error)
+            }
+          }
+        } catch (error) {
+          console.log(`❌ Chain ${chain} failed:`, error.message)
+          if (error.message.includes('timeout')) {
+            console.log('⏰ MCP call timed out, falling back to direct API')
+            break
+          }
         }
       }
       
-      console.log('✅ MCP Portfolio result:', result)
-      return result
+      throw new Error('All MCP chain formats failed or timed out')
     } catch (error) {
       console.error('❌ Portfolio fetch failed:', error.message)
       throw error
@@ -255,5 +247,52 @@ export class MCPClient {
 
   async checkMaliciousAddress(address) {
     return await this.callTool('check_malicous_address', { address })
+  }
+
+  // Get supported chains with static fallback to prevent infinite loading
+  async getSupportedChains() {
+    try {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Chains call timeout')), 3000)
+      })
+      
+      const chainsCall = this.callTool('gateway_get_supported_chains')
+      const result = await Promise.race([chainsCall, timeoutPromise])
+      
+      if (result && result.content?.[0]?.text) {
+        const parsed = JSON.parse(result.content[0].text)
+        // Make sure we return an array, not a string that gets split into characters
+        if (parsed.chains && Array.isArray(parsed.chains)) {
+          return { chains: parsed.chains }
+        }
+      }
+    } catch (error) {
+      console.log('❌ Failed to get supported chains:', error.message)
+    }
+    
+    // Always return a static, safe list
+    return { 
+      chains: ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'avalanche'] 
+    }
+  }
+
+  // Get exchange rate with timeout
+  async getExchangeRateWithTimeout(baseCurrency, quoteCurrency = 'USD') {
+    try {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Exchange rate timeout')), 3000)
+      })
+      
+      const rateCall = this.callTool('get_exchange_rate', { baseCurrency, quoteCurrency })
+      const result = await Promise.race([rateCall, timeoutPromise])
+      
+      if (result && result.content?.[0]?.text) {
+        return JSON.parse(result.content[0].text)
+      }
+      return { rate: 0 }
+    } catch (error) {
+      console.log(`❌ Exchange rate failed for ${baseCurrency}:`, error.message)
+      return { rate: 0 }
+    }
   }
 }

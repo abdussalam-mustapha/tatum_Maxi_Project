@@ -67,6 +67,56 @@ app.get('/api/mcp/test/:address', async (req, res) => {
 app.get('/api/portfolio/:address', async (req, res) => {
   try {
     const { address } = req.params
+    console.log(`📊 Portfolio request for address: ${address}`)
+    
+    const portfolioData = await tatumService.getPortfolioData(address)
+    res.json(portfolioData)
+  } catch (error) {
+    console.error('Portfolio API error:', error)
+    res.status(500).json({ 
+      error: 'Failed to fetch portfolio data',
+      details: error.message 
+    })
+  }
+})
+
+// Supported chains endpoint
+app.get('/api/chains', async (req, res) => {
+  try {
+    console.log('🔗 Supported chains request')
+    const chains = await tatumService.getSupportedChains()
+    res.json(chains)
+  } catch (error) {
+    console.error('Chains API error:', error)
+    res.status(500).json({ 
+      error: 'Failed to fetch supported chains',
+      details: error.message 
+    })
+  }
+})
+
+// Exchange rates endpoint
+app.get('/api/rates', async (req, res) => {
+  try {
+    const { currencies } = req.query
+    const currencyList = currencies ? currencies.split(',').slice(0, 5) : ['ETH', 'BTC', 'MATIC'] // Limit to prevent blocking
+    
+    console.log(`💱 Exchange rates request for: ${currencyList.join(', ')}`)
+    const rates = await tatumService.getExchangeRates(currencyList)
+    res.json({ rates, timestamp: new Date().toISOString() })
+  } catch (error) {
+    console.error('Rates API error:', error)
+    res.status(500).json({ 
+      error: 'Failed to fetch exchange rates',
+      details: error.message 
+    })
+  }
+})
+
+// Transaction history endpoint
+app.get('/api/portfolio/:address', async (req, res) => {
+  try {
+    const { address } = req.params
     
     if (!address) {
       return res.status(400).json({ error: 'Wallet address is required' })
@@ -418,6 +468,8 @@ app.listen(PORT, () => {
   console.log(`   GET /api/health`)
   console.log(`   GET /api/mcp/status`)
   console.log(`   GET /api/portfolio/:address`)
+  console.log(`   GET /api/chains`)
+  console.log(`   GET /api/rates`)
   console.log(`   GET /api/transactions/:address`)
   console.log(`   GET /api/nfts/:address`)
   console.log(`   POST /api/ai/analyze`)
