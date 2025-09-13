@@ -168,6 +168,7 @@ Get NFT holdings (optional feature).
 2. **View Portfolio**: See total USD value and breakdown by chain
 3. **Explore Holdings**: Review native balances and token holdings
 4. **Track Performance**: Monitor your crypto investments in one place
+5. **Chat with AI chatbot**: do more complex portfolio tracking and analysis
 
 ## Supported Blockchains
 
