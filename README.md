@@ -108,7 +108,6 @@ This project uses **Model Context Protocol (MCP)** to securely connect to Tatum'
 
 - 📋 **MCP Configuration**: `mcp-config.json` 
 - 🔗 **Real-time Data**: Live blockchain data when API key is configured
-- 🎭 **Demo Mode**: Mock data fallback for presentations
 - 🛠️ **MCP Tools**: Balance, tokens, transactions, NFTs
 
 See `MCP_SETUP.md` for detailed setup instructions.
