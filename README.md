@@ -6,7 +6,7 @@ A multi-chain crypto portfolio tracker that allows users to view their balances,
 
 ## Features
 
-- **Multi-Chain Support**: Track balances across Ethereum, Polygon,Optimism, Arbitrage, Avalanche and Solana
+- **Multi-Chain Support**: Track balances across Ethereum, Polygon,Optimism, Arbitrum, Avalanche and Solana
 - **Real-Time Portfolio**: View total USD value and chain-by-chain breakdown
 - **Token Holdings**: See all ERC-20 and SPL tokens in your wallets
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
