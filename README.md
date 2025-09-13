@@ -174,6 +174,9 @@ Get NFT holdings (optional feature).
 - ⟠ **Ethereum** - ETH and ERC-20 tokens
 - ⬟ **Polygon** - MATIC and Polygon tokens  
 - ◎ **Solana** - SOL and SPL tokens
+- **Arbitrum**
+- **Avalanche**
+- **Optimism**
 
 ## Development
 
