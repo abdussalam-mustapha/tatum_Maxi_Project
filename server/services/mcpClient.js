@@ -183,7 +183,7 @@ export class MCPClient {
         setTimeout(() => reject(new Error('MCP call timeout after 5 seconds')), 5000)
       })
       
-      // Use only valid, known chain formats - NO DYNAMIC FETCHING
+      
       const chainFormats = [
         'ethereum',
         'ethereum-mainnet', 
